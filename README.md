@@ -1,32 +1,31 @@
 # postgres-docker
 
 ```
-docker pull postgres
+mkdir postgres
+cd postgres
 
-docker run --rm --name pg-docker -e POSTGRES_PASSWORD=docker -d -p 5432:5432 -v postgres:/var/lib/postgresql/data postgres
+docker volume create --driver local --name=pgvolume
 
-docker exec -it pg-docker sh
+create a file named pg-env.list containing:
+PG_MODE=primary
+PG_PRIMARY_USER=postgres
+PG_PRIMARY_PASSWORD=yoursecurepassword
+PG_DATABASE=testdb
+PG_USER=yourusername
+PG_PASSWORD=yoursecurepassword
+PG_ROOT_PASSWORD=yoursecurepassword
+PG_PRIMARY_PORT=5432
 
-createdb -U postgres mydb
+docker network create --driver bridge pgnetwork
 
-psql -U postgres mydb
+docker run --publish 5432:5432 --volume=pgvolume:/pgdata --env-file=pg-env.list --name=postgres --hostname=postgres --network=pgnetwork --detach postgres
 
-\l
+docker volume create --driver local --name=pga4volume
 
-select version();
+create a file named pgadmin-env.list containing:
+PGADMIN_SETUP_EMAIL=youremail@yourdomain.com
+PGADMIN_SETUP_PASSWORD=yoursecurepassword
+SERVER_PORT=5050
 
-select current_date;
-
-CREATE TABLE people (id int, name varchar(80));
-
-INSERT INTO people (id,name) VALUES (1, 'People 1');
-
-SELECT * FROM people;
-
-\q
-
-exit
-
-docker stop pg-docker
-
+docker run --publish 5050:5050 --volume=pga4volume:/var/lib/pgadmin --env-file=pgadmin-env.list --name=pgadmin4 --hostname=pgadmin4 --network=pgnetwork --detach crunchydata/crunchy-pgadmin4:centos7-10.4-2.0.0
 ```
