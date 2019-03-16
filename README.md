@@ -17,4 +17,16 @@ select version();
 
 select current_date;
 
+CREATE TABLE people (id int, name varchar(80));
+
+INSERT INTO people (id,name) VALUES (1, 'People 1');
+
+SELECT * FROM people;
+
+\q
+
+exit
+
+docker stop pg-docker
+
 ```
